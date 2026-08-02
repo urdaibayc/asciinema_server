@@ -1,0 +1,28 @@
+services:
+  asciinema:
+    image: ghcr.io/asciinema/asciinema-server:20260626
+    ports:
+      - '8080:4000'
+    environment:
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - URL_HOST=${URL_HOST}
+      - URL_PORT=${URL_PORT}
+      - URL_SCHEME=http
+      - TZ=UTC
+    volumes:
+      - /srv/asciinema/asciinema:/var/lib/asciinema
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: docker.io/library/postgres:14
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - /srv/asciinema/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 5s
+      retries: 10
