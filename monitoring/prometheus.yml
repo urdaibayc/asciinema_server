@@ -1,0 +1,43 @@
+prometheus.yml
+
+# Prometheus Configuration for asciinema Server Monitoring
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Node exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    
+  # cAdvisor for container metrics
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+    
+  # Pushgateway for custom metrics
+  - job_name: 'pushgateway'
+    static_configs:
+      - targets: ['pushgateway:9091']
+    
+  # Asciinema server metrics (if available)
+  - job_name: 'asciinema'
+    static_configs:
+      - targets: ['asciinema:4000']
+    metrics_path: '/metrics'
+    
+  # PostgreSQL metrics (if available)
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:5432']
+    metrics_path: '/metrics'
+
+rule_files:
+  - "alert_rules.yml"
+
+ alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093

@@ -1,0 +1,50 @@
+# Database Performance Dashboard (Placeholder)
+# This is a basic database performance dashboard template
+
+apiVersion: 1
+kind: Dashboard
+dashboard:
+  title: Database Performance
+  panels:
+    - title: Database Connections
+      type: stat
+      targets:
+        - expr: "pg_stat_activity_count"
+          legendFormat: "Active connections"
+      gridPos:
+        x: 0
+        y: 0
+        w: 12
+        h: 8
+    - title: Query Performance
+      type: graph
+      targets:
+        - expr: "rate(pg_stat_activity_total[5m])"
+          legendFormat: "Queries per second"
+      gridPos:
+        x: 12
+        y: 0
+        w: 12
+        h: 8
+    - title: Database Size
+      type: stat
+      targets:
+        - expr: "pg_database_size_bytes"
+          legendFormat: "Database size"
+      gridPos:
+        x: 0
+        y: 8
+        w: 12
+        h: 8
+    - title: Backup Status
+      type: stat
+      targets:
+        - expr: "pg_backup_last_success"
+          legendFormat: "Last backup"
+      gridPos:
+        x: 12
+        y: 8
+        w: 12
+        h: 8
+
+dashboard: {}

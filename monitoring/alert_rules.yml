@@ -1,0 +1,93 @@
+# Alert Rules for asciinema Server
+# See https://prometheus.io/docs/prometheus/latest/configuration/recording_rules/
+groups:
+  - name: asciinema_alerts
+    rules:
+      # Container resource alerts
+      - alert: HighCPUUsage
+        expr: node_cpu_seconds_total{mode="idle"} / node_cpu_seconds_total{mode="idle"} * 100 < 20
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 5 minutes"
+      
+      - alert: MemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is above 80% for more than 5 minutes"
+      
+      - alert: DiskSpace
+        expr: node_filesystem_free_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100 < 15
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Low disk space"
+          description: "Disk space is below 15%"
+      
+      # Database alerts
+      - alert: DatabaseDown
+        expr: up{job="postgres"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Database is down"
+          description: "PostgreSQL is not responding"
+      
+      # Application alerts
+      - alert: ApplicationDown
+        expr: up{job="asciinema"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Application is down"
+          description: "Asciinema server is not responding"
+      
+      # Network alerts
+      - alert: HighNetworkLoad
+        expr: rate(node_network_receive_bytes_total * 8) > 1024 * 1024 * 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network load"
+          description: "Network load is above 100Mbps for more than 5 minutes"
+
+  - name: system_alerts
+    rules:
+      - alert: HighSystemLoad
+        expr: node_load1 > node_cpu_cores * 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High system load"
+          description: "System load is above 80% of available cores"
+
+  - name: container_alerts
+    rules:
+      - alert: HighContainerCpu
+        expr: container_cpu_usage_total > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High container CPU usage"
+          description: "Container CPU usage is above 80% for more than 5 minutes"
+      
+      - alert: HighContainerMemory
+        expr: container_memory_usage_bytes / container_spec_memory_limit_bytes * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High container memory usage"
+          description: "Container memory usage is above 80% for more than 5 minutes"

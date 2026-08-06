@@ -1,0 +1,87 @@
+grafana.yml
+
+title: Monitoring Provisioning
+
+check_update: true
+
+notifications:
+  delete_secrets: true
+
+plugins:
+  - name: grafana-piechart-panel
+    version: "latest"
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    url: http://prometheus:9090
+    access: proxy
+    is_default: true
+    json_data:
+      time_interval: "15s"
+      query_timeout: "60s"
+    secure_json_data:
+      httpHeaderValue1: "Bearer ${GRAFANA_API_KEY}"
+    version: 1
+    editable: true
+    
+  - name: PostgreSQL
+    type: postgres
+    url: postgres:5432
+    database: postgres
+    user: postgres
+    secure_json_data:
+      password: "${POSTGRES_PASSWORD}"
+    json_data:
+      sslmode: "disable"
+    version: 1
+    editable: false
+    
+  - name: Node Exporter
+    type: prometheus
+    url: http://node-exporter:9100/metrics
+    access: proxy
+    is_default: false
+    json_data:
+      time_interval: "15s"
+    version: 1
+    editable: false
+
+dashboards:
+  - name: System Overview
+    type: file
+    path: /etc/grafana/provisioning/dashboards/system-overview.json
+    
+  - name: Application Metrics
+    type: file
+    path: /etc/grafana/provisioning/dashboards/application-metrics.json
+    
+  - name: Database Performance
+    type: file
+    path: /etc/grafana/provisioning/dashboards/database-performance.json
+    
+  - name: Container Performance
+    type: file
+    path: /etc/grafana/provisioning/dashboards/container-performance.json
+
+alerting:
+  alertmanagers:
+    - name: Alertmanager
+      url: http://alertmanager:9093
+      access: proxy
+      basic_auth:
+        username: "${ALERTMANAGER_USER}"
+        password: "${ALERTMANAGER_PASSWORD}"
+
+folders:
+  - name: Monitoring
+    uid: monitoring
+    type: dashboard
+
+ssh_tunnel_datasource:
+  - name: SSH Tunnel
+    url: ssh_tunnel://grafana-ssh-tunnel:22
+    tunnel_url: ${GRAFANA_SSH_HOST}
+    user: ${GRAFANA_SSH_USER}
+    insecure_skip_verify: true
+

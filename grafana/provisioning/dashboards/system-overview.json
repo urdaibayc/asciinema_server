@@ -1,0 +1,51 @@
+# System Overview Dashboard (Placeholder)
+# This is a basic system overview dashboard template
+# In production, this would be a complete Grafana dashboard configuration
+
+apiVersion: 1
+kind: Dashboard
+dashboard:
+  title: System Overview
+  panels:
+    - title: CPU Usage
+      type: stat
+      targets:
+        - expr: "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)"
+          legendFormat: "{{instance}}"
+      gridPos:
+        x: 0
+        y: 0
+        w: 12
+        h: 8
+    - title: Memory Usage
+      type: stat
+      targets:
+        - expr: "(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100"
+          legendFormat: "{{instance}}"
+      gridPos:
+        x: 12
+        y: 0
+        w: 12
+        h: 8
+    - title: Disk Usage
+      type: stat
+      targets:
+        - expr: "(1 - (node_filesystem_free_bytes{mountpoint=\"/\"} / node_filesystem_size_bytes{mountpoint=\"/\"})) * 100"
+          legendFormat: "{{instance}}"
+      gridPos:
+        x: 0
+        y: 8
+        w: 12
+        h: 8
+    - title: Network I/O
+      type: graph
+      targets:
+        - expr: "rate(node_network_receive_bytes_total{device=\"eth0\"}[5m])"
+          legendFormat: "Received {{instance}}"
+      gridPos:
+        x: 12
+        y: 8
+        w: 12
+        h: 8
+  
+dashboard: {}

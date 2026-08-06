@@ -1,0 +1,50 @@
+# Container Performance Dashboard (Placeholder)
+# This is a basic container performance dashboard template
+
+apiVersion: 1
+kind: Dashboard
+dashboard:
+  title: Container Performance
+  panels:
+    - title: CPU Usage
+      type: graph
+      targets:
+        - expr: "container_cpu_usage_total"
+          legendFormat: "CPU usage %"
+      gridPos:
+        x: 0
+        y: 0
+        w: 12
+        h: 8
+    - title: Memory Usage
+      type: graph
+      targets:
+        - expr: "container_memory_usage_bytes / container_spec_memory_limit_bytes * 100"
+          legendFormat: "Memory usage %"
+      gridPos:
+        x: 12
+        y: 0
+        w: 12
+        h: 8
+    - title: Network I/O
+      type: graph
+      targets:
+        - expr: "container_network_receive_bytes_total"
+          legendFormat: "Received {{instance}}"
+      gridPos:
+        x: 0
+        y: 8
+        w: 12
+        h: 8
+    - title: Filesystem Usage
+      type: graph
+      targets:
+        - expr: "container_filesystem_usage_bytes"
+          legendFormat: "Usage {{mountpoint}}"
+      gridPos:
+        x: 12
+        y: 8
+        w: 12
+        h: 8
+
+dashboard: {}
